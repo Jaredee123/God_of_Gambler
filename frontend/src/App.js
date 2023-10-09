@@ -15,7 +15,7 @@ function App() {
 }
 
 function Header() {
-  const appTitle = 'God of Gambler';
+  const appTitle = 'God of Gambling';
   return (
     <header>
       <div className="logo">
@@ -49,7 +49,7 @@ function Players({ player_count }) {
     const player_inputs = [];
     for (let i = 1; i <= player_count; i++) {
       player_inputs.push(
-        <input key={i} type="number" placeholder={`Player ${i}`} />
+        <input key={i} type="number" placeholder={`Player ${i}`} />,
       );
     }
     return player_inputs;
@@ -63,4 +63,3 @@ function Players({ player_count }) {
 }
 
 export default App;
-
