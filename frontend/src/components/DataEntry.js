@@ -1,10 +1,23 @@
-import React, { useState, useReducer, useCallback, useEffect } from 'react';
+import React, { useReducer, useCallback } from 'react';
 
 function DataEntry() {
-  const [player_count, setplayer_count] = useState('4');
   const formReducer = (state, action) => {
     switch (action.type) {
-      case 'CHANGE':
+      case 'Player_count_change':
+        return {
+          ...state,
+          player_count: action.value,
+          inputs: {
+            ...Array.from(
+              { length: action.value },
+              (_, i) => `Player${i + 1}`,
+            ).reduce((acc, player) => {
+              acc[player] = { value: '' };
+              return acc;
+            }, {}),
+          },
+        };
+      case 'Player_inputs_change':
         return {
           ...state,
           inputs: {
@@ -12,45 +25,58 @@ function DataEntry() {
             [action.inputId]: { value: action.value },
           },
         };
+      case 'BuyIn_amount_change':
+        return {
+          ...state,
+          [action.inputId]: { value: action.value },
+        };
       default:
         return state;
     }
   };
   const initialState = {
-    inputs: {
-      BuyInAmount: { value: '' },
-      ...Array.from(
-        { length: player_count },
-        (_, i) => `Player${i + 1}`,
-      ).reduce((acc, player) => {
-        acc[player] = { value: '' };
-        return acc;
-      }, {}),
-    },
+    BuyInAmount: { value: '' },
+    inputs: {},
   };
   const [formState, dispatch] = useReducer(formReducer, initialState);
-  const inputHandler = useCallback((id, value) => {
+  const inputHandler = useCallback((event) => {
     dispatch({
-      type: 'CHANGE',
-      value: value,
-      inputId: id,
+      type: 'Player_inputs_change',
+      value: event.target.value,
+      inputId: event.target.id,
+    });
+  }, []);
+  const countHandler = useCallback((event) => {
+    dispatch({
+      type: 'Player_count_change',
+      value: event.target.value,
+    });
+  }, []);
+  const buyinHandler = useCallback((event) => {
+    dispatch({
+      type: 'BuyIn_amount_change',
+      value: event.target.value,
+      inputId: event.target.id,
     });
   }, []);
 
   const formSubmissionHandler = (event) => {
     event.preventDefault();
-    console.log(formState.inputs);
+    console.log(formState);
   };
   return (
     <>
       <Header />
       <form>
-        <BuyInAmount onChange={inputHandler} />
+        <BuyInAmount buyinHandler={buyinHandler} />
         <PlayerCount
-          player_count={player_count}
-          setplayer_count={setplayer_count}
+          playerCount={formState.player_count}
+          countHandler={countHandler}
         />
-        <PlayerInputs player_count={player_count} />
+        <PlayerInputs
+          playerCount={formState.player_count}
+          inputHandler={inputHandler}
+        />
         <button onClick={formSubmissionHandler}>
           Calculate Payment Statements
         </button>
@@ -76,33 +102,33 @@ function Header() {
   );
 }
 
-function BuyInAmount({ inputHandler }) {
+function BuyInAmount({ buyinHandler }) {
   return (
     <input
       id="BuyInAmount"
       type="number"
       placeholder="Buy In Amount"
-      onChange={inputHandler}
+      onChange={buyinHandler}
     />
   );
 }
 
-function PlayerCount({ player_count, setplayer_count }) {
+function PlayerCount({ playerCount, countHandler }) {
   return (
     <input
       id="PlayerCount"
       type="number"
       placeholder="Number of Players"
-      value={player_count}
-      onChange={(e) => setplayer_count(e.target.value)}
+      value={playerCount}
+      onChange={countHandler}
     />
   );
 }
 
-function PlayerInputs({ player_count, inputHandler }) {
+function PlayerInputs({ playerCount, inputHandler }) {
   function generate_player_inputs() {
     const player_inputs = [];
-    for (let i = 1; i <= player_count; i++) {
+    for (let i = 1; i <= playerCount; i++) {
       player_inputs.push(
         <input
           id={`Player${i}`}
