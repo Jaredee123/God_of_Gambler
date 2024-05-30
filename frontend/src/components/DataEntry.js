@@ -1,4 +1,5 @@
 import React, { useReducer, useCallback } from 'react';
+import './DataEntry.css';
 
 function DataEntry() {
   const formReducer = (state, action) => {
@@ -34,11 +35,14 @@ function DataEntry() {
         return state;
     }
   };
+
   const initialState = {
     BuyInAmount: { value: '' },
     inputs: {},
   };
+
   const [formState, dispatch] = useReducer(formReducer, initialState);
+
   const inputHandler = useCallback((event) => {
     dispatch({
       type: 'Player_inputs_change',
@@ -46,12 +50,14 @@ function DataEntry() {
       inputId: event.target.id,
     });
   }, []);
+
   const countHandler = useCallback((event) => {
     dispatch({
       type: 'Player_count_change',
       value: event.target.value,
     });
   }, []);
+
   const buyinHandler = useCallback((event) => {
     dispatch({
       type: 'BuyIn_amount_change',
@@ -64,10 +70,11 @@ function DataEntry() {
     event.preventDefault();
     console.log(formState);
   };
+
   return (
-    <>
+    <div className="container">
       <Header />
-      <form>
+      <form className="form">
         <BuyInAmount buyinHandler={buyinHandler} />
         <PlayerCount
           playerCount={formState.player_count}
@@ -77,18 +84,22 @@ function DataEntry() {
           playerCount={formState.player_count}
           inputHandler={inputHandler}
         />
-        <button onClick={formSubmissionHandler}>
+        <button
+          type="button"
+          className="btn btn-success"
+          onClick={formSubmissionHandler}
+        >
           Calculate Payment Statements
         </button>
       </form>
-    </>
+    </div>
   );
 }
 
 function Header() {
   const appTitle = 'God of Gambling';
   return (
-    <header>
+    <header className="header">
       <div className="logo">
         <img
           src="godofgambler_icon.png"
@@ -105,6 +116,7 @@ function Header() {
 function BuyInAmount({ buyinHandler }) {
   return (
     <input
+      className="input buyin-amount"
       id="BuyInAmount"
       type="number"
       placeholder="Buy In Amount"
@@ -116,6 +128,7 @@ function BuyInAmount({ buyinHandler }) {
 function PlayerCount({ playerCount, countHandler }) {
   return (
     <input
+      className="input player-count"
       id="PlayerCount"
       type="number"
       placeholder="Number of Players"
@@ -131,6 +144,8 @@ function PlayerInputs({ playerCount, inputHandler }) {
     for (let i = 1; i <= playerCount; i++) {
       player_inputs.push(
         <input
+          className="input player-input"
+          key={i}
           id={`Player${i}`}
           type="number"
           placeholder={`Player ${i}`}
@@ -142,4 +157,5 @@ function PlayerInputs({ playerCount, inputHandler }) {
   }
   return <>{generate_player_inputs()}</>;
 }
+
 export default DataEntry;
