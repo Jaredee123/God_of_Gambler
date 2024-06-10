@@ -2,34 +2,72 @@ import React, { useReducer, useCallback } from 'react';
 import './DataEntry.css';
 
 function DataEntry() {
+  const validator1 = (value) => {
+    return value !== '' && value !== '0' && /^\d*\.?\d*$/.test(value);
+  };
+
+  const validator2 = (value) => {
+    return value !== '' && /^\d*\.?\d*$/.test(value);
+  };
+
   const formReducer = (state, action) => {
     switch (action.type) {
       case 'Player_count_change':
         return {
           ...state,
-          player_count: action.value,
+          playerCount: {
+            value: action.value,
+            isValid: validator1(action.value),
+          },
           inputs: {
             ...Array.from(
               { length: action.value },
               (_, i) => `Player${i + 1}`,
             ).reduce((acc, player) => {
-              acc[player] = { value: '' };
+              acc[player] = { value: '', isValid: false };
               return acc;
             }, {}),
           },
+          formIsValid: false,
         };
       case 'Player_inputs_change':
+        let inputsAreValid = true;
+        for (const inputId in state.inputs) {
+          if (inputId === action.inputId) {
+            inputsAreValid = inputsAreValid && validator2(action.value);
+          } else {
+            inputsAreValid = inputsAreValid && state.inputs[inputId].isValid;
+          }
+        }
         return {
           ...state,
           inputs: {
             ...state.inputs,
-            [action.inputId]: { value: action.value },
+            [action.inputId]: {
+              value: action.value,
+              isValid: validator2(action.value),
+            },
           },
+          formIsValid:
+            inputsAreValid &&
+            state.BuyInAmount.isValid &&
+            state.playerCount.isValid,
         };
-      case 'BuyIn_amount_change':
+      case 'Buy_in_amount_change':
+        let inputsAreValid2 = true;
+        for (const inputId in state.inputs) {
+          inputsAreValid2 = inputsAreValid2 && state.inputs[inputId].isValid;
+        }
         return {
           ...state,
-          [action.inputId]: { value: action.value },
+          BuyInAmount: {
+            value: action.value,
+            isValid: validator1(action.value),
+          },
+          formIsValid:
+            inputsAreValid2 &&
+            validator1(action.value) &&
+            state.playerCount.isValid,
         };
       default:
         return state;
@@ -37,8 +75,10 @@ function DataEntry() {
   };
 
   const initialState = {
-    BuyInAmount: { value: '' },
+    BuyInAmount: { value: '', isValid: false },
+    playerCount: { value: '', isValid: false },
     inputs: {},
+    formIsValid: false,
   };
 
   const [formState, dispatch] = useReducer(formReducer, initialState);
@@ -60,7 +100,7 @@ function DataEntry() {
 
   const buyinHandler = useCallback((event) => {
     dispatch({
-      type: 'BuyIn_amount_change',
+      type: 'Buy_in_amount_change',
       value: event.target.value,
       inputId: event.target.id,
     });
@@ -77,17 +117,18 @@ function DataEntry() {
       <form className="form">
         <BuyInAmount buyinHandler={buyinHandler} />
         <PlayerCount
-          playerCount={formState.player_count}
+          playerCount={formState.playerCount.value}
           countHandler={countHandler}
         />
         <PlayerInputs
-          playerCount={formState.player_count}
+          playerCount={formState.playerCount.value}
           inputHandler={inputHandler}
         />
         <button
           type="button"
           className="btn btn-success"
           onClick={formSubmissionHandler}
+          disabled={!formState.formIsValid}
         >
           Calculate Payment Statements
         </button>
@@ -139,10 +180,10 @@ function PlayerCount({ playerCount, countHandler }) {
 }
 
 function PlayerInputs({ playerCount, inputHandler }) {
-  function generate_player_inputs() {
-    const player_inputs = [];
+  function generatePlayerInputs() {
+    const playerInputs = [];
     for (let i = 1; i <= playerCount; i++) {
-      player_inputs.push(
+      playerInputs.push(
         <input
           className="input player-input"
           key={i}
@@ -153,9 +194,9 @@ function PlayerInputs({ playerCount, inputHandler }) {
         />,
       );
     }
-    return player_inputs;
+    return playerInputs;
   }
-  return <>{generate_player_inputs()}</>;
+  return <>{generatePlayerInputs()}</>;
 }
 
 export default DataEntry;
