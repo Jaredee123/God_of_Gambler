@@ -1,7 +1,7 @@
 import React, { useReducer, useCallback } from 'react';
 import './CreateGame.css';
 
-function DataEntry() {
+function CreateGame() {
   const validator1 = (value) => {
     return value !== '' && value !== '0' && /^\d*\.?\d*$/.test(value);
   };
@@ -125,7 +125,7 @@ function DataEntry() {
         />
         <button
           type="button"
-          className="btn btn-success"
+          className="btn-success"
           onClick={formSubmissionHandler}
           disabled={!formState.formIsValid}
         >
@@ -181,4 +181,4 @@ function PlayerInputs({ playerCount, inputHandler }) {
   return <>{generatePlayerInputs()}</>;
 }
 
-export default DataEntry;
+export default CreateGame;
