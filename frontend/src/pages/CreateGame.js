@@ -1,5 +1,5 @@
 import React, { useReducer, useCallback } from 'react';
-import './DataEntry.css';
+import './CreateGame.css';
 
 function DataEntry() {
   const validator1 = (value) => {
@@ -113,7 +113,6 @@ function DataEntry() {
 
   return (
     <div className="container">
-      <Header />
       <form className="form">
         <BuyInAmount buyinHandler={buyinHandler} />
         <PlayerCount
@@ -134,23 +133,6 @@ function DataEntry() {
         </button>
       </form>
     </div>
-  );
-}
-
-function Header() {
-  const appTitle = 'God of Gambling';
-  return (
-    <header className="header">
-      <div className="logo">
-        <img
-          src="godofgambler_icon.png"
-          height="68"
-          width="68"
-          alt="God of Gambling logo"
-        />
-        <h1>{appTitle}</h1>
-      </div>
-    </header>
   );
 }
 

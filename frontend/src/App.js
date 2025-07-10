@@ -1,18 +1,20 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import DataEntry from './components/DataEntry';
-import Results from './components/Results';
+import DataEntry from './pages/CreateGame';
+import Results from './pages/ListGame';
+import Header from './shared/Header';
 
 function App() {
   return (
     <Router>
+      <Header />
       <main>
         <Switch>
           <Route path="/" exact>
             <DataEntry />
           </Route>
-          <Route path="/results" exact>
+          <Route path="/game" exact>
             <Results />
           </Route>
         </Switch>
