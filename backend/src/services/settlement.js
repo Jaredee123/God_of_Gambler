@@ -1,34 +1,42 @@
 // src/services/settlement.js
-
-/**
- * Given an array of { name, buyIn, cashOut },
- * returns [{ from, to, amount }, …] so that everyone ends
- * with net zero.
- */
 export function computeSettlements(players) {
-  // 1) Compute net for each player
+  // 1) Net balances
   const net = players.map(p => ({
-    name: p.name,
+    name:    p.name,
     balance: p.cashOut - p.buyIn,
   }));
 
-  // 2) Separate debtors (<0) and creditors (>0)
-  const debtors   = net.filter(p => p.balance < 0)
-                       .map(p => ({ ...p, amount: -p.balance }));
-  const creditors = net.filter(p => p.balance > 0)
-                       .map(p => ({ ...p, amount: p.balance }));
+  // 2) Build and sort debtors/creditors
+  const debtors = net
+    .filter(p => p.balance < 0)
+    .map(p => ({ name: p.name, amount: -p.balance }))
+    .sort((a, b) => b.amount - a.amount);      // largest debtor first
 
+  const creditors = net
+    .filter(p => p.balance > 0)
+    .map(p => ({ name: p.name, amount: p.balance }))
+    .sort((a, b) => b.amount - a.amount);      // largest creditor first
+
+  // 3) Greedy settle
   const payments = [];
   let i = 0, j = 0;
-  // 3) Greedy match debtors → creditors
   while (i < debtors.length && j < creditors.length) {
-    const d = debtors[i], c = creditors[j];
-    const amt = Math.min(d.amount, c.amount);
-    payments.push({ from: d.name, to: c.name, amount: amt });
-    d.amount -= amt;
-    c.amount -= amt;
-    if (d.amount === 0) i++;
-    if (c.amount === 0) j++;
+    const debtor   = debtors[i];
+    const creditor = creditors[j];
+    const amt      = Math.min(debtor.amount, creditor.amount);
+
+    payments.push({
+      from:   debtor.name,
+      to:     creditor.name,
+      amount: amt
+    });
+
+    debtor.amount   -= amt;
+    creditor.amount -= amt;
+
+    if (debtor.amount === 0)   i++;
+    if (creditor.amount === 0) j++;
   }
+
   return payments;
 }

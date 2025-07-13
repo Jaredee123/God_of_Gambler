@@ -10,10 +10,10 @@ const Navbar = () => {
           God of Gambling
         </Link>
         <div className="d-flex">
-          <Link to="/game">
+          <Link to="/search-game">
             <button className="btn btn-primary mx-2">Search Game</button>
           </Link>
-          <Link to="/">
+          <Link to="/create-game">
             <button className="btn btn-success mx-2">Create a New Game</button>
           </Link>
         </div>

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import CreateGame from './pages/CreateGame/CreateGame';
 import SearchGame from './pages/SearchGame/SearchGame';
+import LandingPage from './pages/LandingPage/LandingPage';
 import Navbar from './shared/Navbar';
 import Header from './shared/Header';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -15,10 +16,13 @@ function App() {
       <main>
         <Switch>
           <Route path="/" exact>
-            <CreateGame />
+            <LandingPage />
           </Route>
-          <Route path="/game" exact>
+          <Route path="/search-game" exact>
             <SearchGame />
+          </Route>
+          <Route path="/create-game" exact>
+            <CreateGame />
           </Route>
         </Switch>
       </main>

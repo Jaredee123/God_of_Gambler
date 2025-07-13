@@ -1,0 +1,56 @@
+/* LandingPage.css */
+
+.landing-content {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.features h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.features ul {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.features li {
+  font-size: 1rem;
+  line-height: 1.5;
+  padding-left: 1.25em;
+  position: relative;
+}
+
+.features li::before {
+  content: "🎯";
+  position: absolute;
+  left: 0;
+}
+
+@media (max-width: 768px) {
+  .landing-content {
+    margin: 20px;
+    padding: 15px;
+  }
+  .features h2 {
+    font-size: 1.25rem;
+  }
+  .features li {
+    font-size: 0.95rem;
+  }
+}

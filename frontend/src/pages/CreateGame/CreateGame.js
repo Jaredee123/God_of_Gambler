@@ -2,131 +2,145 @@ import React, { useReducer, useCallback } from 'react';
 import './CreateGame.css';
 
 function CreateGame() {
-  const validator1 = (value) => {
-    return value !== '' && value !== '0' && /^\d*\.?\d*$/.test(value);
-  };
+  // Validators
+  const validator1 = (value) => value !== '' && value !== '0' && /^\d*\.?\d*$/.test(value);
+  const validator2 = (value) => value !== '' && /^\d*\.?\d*$/.test(value);
 
-  const validator2 = (value) => {
-    return value !== '' && /^\d*\.?\d*$/.test(value);
-  };
-
+  // Reducer to manage players and buy-ins dynamically
   const formReducer = (state, action) => {
     switch (action.type) {
-      case 'Player_count_change':
+      case 'Player_count_change': {
+        const count = parseInt(action.value, 10) || 0;
+        const isValidCount = validator1(action.value);
+        // Initialize inputs and buy-ins based on count
+        const inputs = {};
+        const buyIns = {};
+        for (let i = 1; i <= count; i++) {
+          inputs[`Player${i}`] = { value: '', isValid: false };
+          buyIns[`BuyIn${i}`] = { value: '', isValid: false };
+        }
         return {
-          ...state,
-          playerCount: {
-            value: action.value,
-            isValid: validator1(action.value),
-          },
-          inputs: {
-            ...Array.from(
-              { length: action.value },
-              (_, i) => `Player${i + 1}`,
-            ).reduce((acc, player) => {
-              acc[player] = { value: '', isValid: false };
-              return acc;
-            }, {}),
-          },
+          playerCount: { value: action.value, isValid: isValidCount },
+          inputs,
+          buyIns,
           formIsValid: false,
         };
-      case 'Player_inputs_change':
-        let inputsAreValid = true;
-        for (const inputId in state.inputs) {
-          if (inputId === action.inputId) {
-            inputsAreValid = inputsAreValid && validator2(action.value);
-          } else {
-            inputsAreValid = inputsAreValid && state.inputs[inputId].isValid;
-          }
-        }
-        return {
-          ...state,
-          inputs: {
-            ...state.inputs,
-            [action.inputId]: {
-              value: action.value,
-              isValid: validator2(action.value),
-            },
+      }
+      case 'Player_inputs_change': {
+        const inputs = {
+          ...state.inputs,
+          [action.inputId]: {
+            value: action.value,
+            isValid: validator2(action.value),
           },
-          formIsValid:
-            inputsAreValid &&
-            state.BuyInAmount.isValid &&
-            state.playerCount.isValid,
         };
-      case 'Buy_in_amount_change':
-        let inputsAreValid2 = true;
-        for (const inputId in state.inputs) {
-          inputsAreValid2 = inputsAreValid2 && state.inputs[inputId].isValid;
-        }
+        const inputsValid = Object.values(inputs).every((inp) => inp.isValid);
+        const buyInsValid = Object.values(state.buyIns).every((b) => b.isValid);
         return {
           ...state,
-          BuyInAmount: {
+          inputs,
+          formIsValid: inputsValid && buyInsValid && state.playerCount.isValid,
+        };
+      }
+      case 'Buy_in_change': {
+        const buyIns = {
+          ...state.buyIns,
+          [action.inputId]: {
             value: action.value,
             isValid: validator1(action.value),
           },
-          formIsValid:
-            inputsAreValid2 &&
-            validator1(action.value) &&
-            state.playerCount.isValid,
         };
+        const inputsValid = Object.values(state.inputs).every((inp) => inp.isValid);
+        const buyInsValid = Object.values(buyIns).every((b) => b.isValid);
+        return {
+          ...state,
+          buyIns,
+          formIsValid: inputsValid && buyInsValid && state.playerCount.isValid,
+        };
+      }
       default:
         return state;
     }
   };
 
+  // Initial state
   const initialState = {
-    BuyInAmount: { value: '', isValid: false },
     playerCount: { value: '', isValid: false },
     inputs: {},
+    buyIns: {},
     formIsValid: false,
   };
 
   const [formState, dispatch] = useReducer(formReducer, initialState);
 
-  const inputHandler = useCallback((event) => {
+  // Handlers
+  const countHandler = useCallback((e) => {
+    dispatch({ type: 'Player_count_change', value: e.target.value });
+  }, []);
+
+  const inputHandler = useCallback((e) => {
     dispatch({
       type: 'Player_inputs_change',
-      value: event.target.value,
-      inputId: event.target.id,
+      value: e.target.value,
+      inputId: e.target.id,
     });
   }, []);
 
-  const countHandler = useCallback((event) => {
+  const buyinHandler = useCallback((e) => {
     dispatch({
-      type: 'Player_count_change',
-      value: event.target.value,
+      type: 'Buy_in_change',
+      value: e.target.value,
+      inputId: e.target.id,
     });
   }, []);
 
-  const buyinHandler = useCallback((event) => {
-    dispatch({
-      type: 'Buy_in_amount_change',
-      value: event.target.value,
-      inputId: event.target.id,
-    });
-  }, []);
-
-  const formSubmissionHandler = (event) => {
-    event.preventDefault();
-    console.log(formState);
+  const formSubmissionHandler = (e) => {
+    e.preventDefault();
+    console.log('Form submitted:', formState);
   };
 
   return (
     <div className="container">
-      <form className="form">
-        <BuyInAmount buyinHandler={buyinHandler} />
-        <PlayerCount
-          playerCount={formState.playerCount.value}
-          countHandler={countHandler}
+      <form className="form" onSubmit={formSubmissionHandler}>
+        {/* Player count input */}
+        <input
+          className="input player-count"
+          id="PlayerCount"
+          type="number"
+          placeholder="Number of Players"
+          value={formState.playerCount.value}
+          onChange={countHandler}
         />
-        <PlayerInputs
-          playerCount={formState.playerCount.value}
-          inputHandler={inputHandler}
-        />
+
+        {/* Dynamic player and buy-in inputs */}
+        {Array.from({ length: Number(formState.playerCount.value) }, (_, i) => {
+          const idx = i + 1;
+          return (
+            <div key={idx} className="player-group">
+              <input
+                className="input player-input"
+                id={`Player${idx}`}
+                type="number"
+                placeholder={`Player ${idx}`}
+                value={formState.inputs[`Player${idx}`]?.value || ''}
+                onChange={inputHandler}
+              />
+              <input
+                className="input buyin-input"
+                id={`BuyIn${idx}`}
+                type="number"
+                placeholder={`Buy-In ${idx}`}
+                value={formState.buyIns[`BuyIn${idx}`]?.value || ''}
+                onChange={buyinHandler}
+              />
+            </div>
+          );
+        })}
+
+        {/* Submission button */}
         <button
-          type="button"
+          type="submit"
           className="btn-success"
-          onClick={formSubmissionHandler}
           disabled={!formState.formIsValid}
         >
           Calculate Payment Statements
@@ -134,51 +148,6 @@ function CreateGame() {
       </form>
     </div>
   );
-}
-
-function BuyInAmount({ buyinHandler }) {
-  return (
-    <input
-      className="input buyin-amount"
-      id="BuyInAmount"
-      type="number"
-      placeholder="Buy In Amount"
-      onChange={buyinHandler}
-    />
-  );
-}
-
-function PlayerCount({ playerCount, countHandler }) {
-  return (
-    <input
-      className="input player-count"
-      id="PlayerCount"
-      type="number"
-      placeholder="Number of Players"
-      value={playerCount}
-      onChange={countHandler}
-    />
-  );
-}
-
-function PlayerInputs({ playerCount, inputHandler }) {
-  function generatePlayerInputs() {
-    const playerInputs = [];
-    for (let i = 1; i <= playerCount; i++) {
-      playerInputs.push(
-        <input
-          className="input player-input"
-          key={i}
-          id={`Player${i}`}
-          type="number"
-          placeholder={`Player ${i}`}
-          onChange={inputHandler}
-        />,
-      );
-    }
-    return playerInputs;
-  }
-  return <>{generatePlayerInputs()}</>;
 }
 
 export default CreateGame;
