@@ -94,3 +94,53 @@ Thumbs.db
 /public/*.html  # if you don’t want to version control generated HTML
 
 # End of .gitignore
+
+
+# Node dependencies
+/node_modules/
+/frontend/node_modules/
+/backend/node_modules/
+.pnp
+.pnp.js
+
+# Testing
+/coverage/
+/frontend/coverage/
+/backend/coverage/
+
+# Production/build outputs
+/build/
+/frontend/build/
+/backend/build/
+/dist/
+/frontend/dist/
+/backend/dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cache
+.eslintcache
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+/frontend/.env
+/backend/.env
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.sw?
+
+# OS files
+.DS_Store
+Thumbs.db
