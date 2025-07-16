@@ -10,7 +10,7 @@ const LandingPage = () => (
           🎲 Settle poker payments quickly based on player Buy In and Cash Out
           amount
         </li>
-        <li>🔍Track past poker games</li>
+        <li>🔍 Track past poker games</li>
       </ul>
     </section>
   </main>
