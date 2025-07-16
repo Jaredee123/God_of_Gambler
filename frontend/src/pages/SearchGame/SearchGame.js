@@ -3,15 +3,36 @@ import './SearchGame.css';
 
 function SearchGame() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [games, setGames] = useState([]);
+  const [error, setError] = useState('');
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
-  const handleSearchSubmit = (event) => {
+  const handleSearchSubmit = async (event) => {
     event.preventDefault();
-    console.log('Searching for:', searchQuery);
-    // You can perform the actual search logic here, e.g., API call or filter data
+    setError('');
+    setGames([]);
+    try {
+      const response = await fetch(
+        `http://localhost:4000/games?player=${encodeURIComponent(searchQuery)}`,
+        {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+          },
+        },
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.error || 'Failed to fetch games');
+      } else {
+        setGames(data);
+      }
+    } catch (err) {
+      setError('Network error: ' + err.message);
+    }
   };
 
   return (
@@ -32,6 +53,13 @@ function SearchGame() {
           Search Game
         </button>
       </form>
+      {error && <div className="error">{error}</div>}
+      {games.length > 0 && (
+        <div className="results">
+          <h3>Games for "{searchQuery}":</h3>
+          <pre>{JSON.stringify(games, null, 2)}</pre>
+        </div>
+      )}
     </div>
   );
 }

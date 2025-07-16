@@ -1,6 +1,5 @@
 /* CreateGame.css */
 
-/* Global box-sizing for consistent sizing */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -79,6 +78,17 @@ h1 {
   font-size: 0.875rem;
   margin-top: -8px;
   margin-bottom: 8px;
+}
+
+/* Results styling for settlements (if needed) */
+.results {
+  margin-top: 20px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 15px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  font-size: 0.95rem;
+  word-break: break-word;
 }
 
 /* Button styling */

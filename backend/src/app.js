@@ -1,9 +1,11 @@
 // src/app.js
 import express from 'express';
 import mongoose from 'mongoose';
+import cors from 'cors'; // <-- add this line
 import gamesRouter from './routes/games.js';
 
 const app = express();
+app.use(cors()); // <-- add this line
 app.use(express.json());
 app.use('/games', gamesRouter);
 

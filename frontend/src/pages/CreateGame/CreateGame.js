@@ -140,9 +140,37 @@ function CreateGame() {
     });
   }, []);
 
-  const formSubmissionHandler = (e) => {
+  const formSubmissionHandler = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formState);
+    // Build players array from formState
+    const players = [];
+    for (let i = 1; i <= displayCount; i++) {
+      players.push({
+        name: formState.names[`Name${i}`]?.value || '',
+        buyIn: Number(formState.buyIns[`BuyIn${i}`]?.value || 0),
+        cashOut: Number(formState.cashOuts[`CashOut${i}`]?.value || 0),
+      });
+    }
+
+    try {
+      const response = await fetch('http://localhost:4000/games', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ players }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.error || 'Failed to create game');
+      } else {
+        alert('Game created! Settlements: ' + JSON.stringify(data.settlements));
+        // Optionally reset form or redirect
+      }
+    } catch (err) {
+      alert('Network error: ' + err.message);
+    }
   };
 
   // Compute display count and sums for UI
