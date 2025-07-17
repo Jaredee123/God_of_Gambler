@@ -133,3 +133,38 @@ input[type='number'] {
     align-items: stretch;
   }
 }
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(40, 40, 40, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 2em 1.5em 1.5em 1.5em;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  max-width: 400px;
+  width: 100%;
+  position: relative;
+}
+
+.popup-close {
+  position: absolute;
+  top: 0.5em;
+  right: 0.7em;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #888;
+  cursor: pointer;
+  line-height: 1;
+}

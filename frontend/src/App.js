@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import CreateGame from './pages/CreateGame/CreateGame';
-import SearchGame from './pages/SearchGame/SearchGame';
+import SearchGames from './pages/SearchGames/SearchGames';
 import LandingPage from './pages/LandingPage/LandingPage';
 import Navbar from './shared/Navbar';
 import Header from './shared/Header';
@@ -18,8 +18,8 @@ function App() {
           <Route path="/" exact>
             <LandingPage />
           </Route>
-          <Route path="/search-game" exact>
-            <SearchGame />
+          <Route path="/search-games" exact>
+            <SearchGames />
           </Route>
           <Route path="/create-game" exact>
             <CreateGame />

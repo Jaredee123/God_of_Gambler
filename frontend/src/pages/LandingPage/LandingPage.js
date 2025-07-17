@@ -7,10 +7,10 @@ const LandingPage = () => (
       <h2>Features</h2>
       <ul>
         <li>
-          🎲 Settle poker payments quickly based on player Buy In and Cash Out
+          🎲 Settle poker payments quickly based on player Buy-In and Cash-Out
           amount
         </li>
-        <li>🔍 Track past poker games</li>
+        <li>🔍 Log and track past poker games</li>
       </ul>
     </section>
   </main>

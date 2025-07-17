@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import './SearchGame.css';
+import './SearchGames.css';
 
-function SearchGame() {
+function SearchGames() {
   const [searchQuery, setSearchQuery] = useState('');
   const [games, setGames] = useState([]);
   const [error, setError] = useState('');
+  const [submittedQuery, setSubmittedQuery] = useState(''); // Track last submitted query
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -14,6 +15,7 @@ function SearchGame() {
     event.preventDefault();
     setError('');
     setGames([]);
+    setSubmittedQuery(searchQuery); // Set submitted query here
     try {
       const response = await fetch(
         `http://localhost:4000/games?player=${encodeURIComponent(searchQuery)}`,
@@ -54,14 +56,46 @@ function SearchGame() {
         </button>
       </form>
       {error && <div className="error">{error}</div>}
+      {games.length === 0 && submittedQuery && !error && (
+        <div className="results">No games found for "{submittedQuery}".</div>
+      )}
       {games.length > 0 && (
         <div className="results">
-          <h3>Games for "{searchQuery}":</h3>
-          <pre>{JSON.stringify(games, null, 2)}</pre>
+          <h3>Games for "{submittedQuery}":</h3>
+          {games.map((game, idx) => (
+            <div key={idx} className="game-block">
+              <div>
+                <strong>Settled At:</strong>{' '}
+                {game.settledAt
+                  ? new Date(game.settledAt).toLocaleString()
+                  : 'N/A'}
+              </div>
+              <div className="section-spacing">
+                <strong>Players:</strong>
+                <ul>
+                  {game.players.map((p, i) => (
+                    <li key={i}>
+                      {p.name} | Buy-In: {p.buyIn} | Cash-Out: {p.cashOut}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="section-spacing">
+                <strong>Settlements:</strong>
+                <ul>
+                  {game.settlements.map((s, i) => (
+                    <li key={i}>
+                      {s.from} pays {s.to}: {s.amount}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
   );
 }
 
-export default SearchGame;
+export default SearchGames;

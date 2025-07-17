@@ -24,7 +24,7 @@ export async function createGame(req, res) {
     // 2) Compute and persist
     const settlements = computeSettlements(players);
     const game = await Game.create({ players, settlements });
-    return res.status(201).json({ gameId: game._id, settlements });
+    return res.status(201).json(game);
 
   } catch (err) {
     console.error(err);
@@ -34,18 +34,17 @@ export async function createGame(req, res) {
 
 // GET /games?player=Alice&player=Bob
 export async function listGames(req, res) {
-  const playerName = req.query.player;           // e.g. /games?player=Alice
+  const playerName = req.query.player;
   if (!playerName) {
     return res
       .status(400)
       .json({ error: 'Please provide a player name, e.g. /games?player=Alice' });
   }
 
-  // Find every game where at least one player has this name
+  // Case-insensitive search
   const games = await Game.find({
-    'players.name': playerName
-  })
-  .sort({ settledAt: -1 });
+    'players.name': { $regex: `^${playerName}$`, $options: 'i' }
+  }).sort({ settledAt: -1 });
 
   return res.json(games);
 }

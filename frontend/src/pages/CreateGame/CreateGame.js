@@ -1,8 +1,10 @@
-import React, { useReducer, useCallback } from 'react';
+import React, { useReducer, useCallback, useState } from 'react';
 import './CreateGame.css';
 
 function CreateGame() {
   const MAX_PLAYERS = 22;
+  const [result, setResult] = useState(null); // For popup data
+  const [showPopup, setShowPopup] = useState(false);
 
   // Validators
   const validatorCount = (value) => {
@@ -11,8 +13,9 @@ function CreateGame() {
       value !== '' && /^\d+$/.test(value) && num >= 1 && num <= MAX_PLAYERS
     );
   };
-  const validatorAmount = (value) =>
+  const validatorAmount1 = (value) =>
     value !== '' && value !== '0' && /^\d*\.?\d*$/.test(value);
+  const validatorAmount2 = (value) => value !== '' && /^\d*\.?\d*$/.test(value);
   const validatorName = (value) => value.trim() !== '';
 
   // Reducer to manage dynamic maps and validity
@@ -55,7 +58,7 @@ function CreateGame() {
           ...state.buyIns,
           [action.inputId]: {
             value: action.value,
-            isValid: validatorAmount(action.value),
+            isValid: validatorAmount1(action.value),
           },
         };
         return updateValidity({ ...state, buyIns });
@@ -66,7 +69,7 @@ function CreateGame() {
           ...state.cashOuts,
           [action.inputId]: {
             value: action.value,
-            isValid: validatorAmount(action.value),
+            isValid: validatorAmount2(action.value),
           },
         };
         return updateValidity({ ...state, cashOuts });
@@ -142,7 +145,6 @@ function CreateGame() {
 
   const formSubmissionHandler = async (e) => {
     e.preventDefault();
-    // Build players array from formState
     const players = [];
     for (let i = 1; i <= displayCount; i++) {
       players.push({
@@ -165,8 +167,13 @@ function CreateGame() {
       if (!response.ok) {
         alert(data.error || 'Failed to create game');
       } else {
-        alert('Game created! Settlements: ' + JSON.stringify(data.settlements));
-        // Optionally reset form or redirect
+        // Extract from data.game
+        setResult({
+          settledAt: data.settledAt,
+          players: data.players,
+          settlements: data.settlements,
+        });
+        setShowPopup(true);
       }
     } catch (err) {
       alert('Network error: ' + err.message);
@@ -196,8 +203,8 @@ function CreateGame() {
           className="input player-count"
           id="PlayerCount"
           type="number"
-          placeholder="Number of Players"
-          min="1"
+          placeholder="Enter number of players"
+          min="2"
           max={MAX_PLAYERS}
           step="1"
           value={formState.playerCount.value}
@@ -205,7 +212,7 @@ function CreateGame() {
         />
         {!formState.playerCount.isValid &&
           formState.playerCount.value !== '' && (
-            <p className="error">Enter a number between 1 and {MAX_PLAYERS}</p>
+            <p className="error">Enter a number between 2 and {MAX_PLAYERS}</p>
           )}
 
         {/* Sum validation feedback */}
@@ -232,7 +239,7 @@ function CreateGame() {
                 className="input buyin-input"
                 id={`BuyIn${idx}`}
                 type="number"
-                placeholder={`Buy-In ${idx}`}
+                placeholder={`Player ${idx} Buy-In`}
                 value={formState.buyIns[`BuyIn${idx}`]?.value || ''}
                 onChange={buyinHandler}
               />
@@ -240,7 +247,7 @@ function CreateGame() {
                 className="input cashout-input"
                 id={`CashOut${idx}`}
                 type="number"
-                placeholder={`Cash-Out ${idx}`}
+                placeholder={`Player ${idx} Cash-Out`}
                 value={formState.cashOuts[`CashOut${idx}`]?.value || ''}
                 onChange={cashoutHandler}
               />
@@ -257,6 +264,44 @@ function CreateGame() {
           Calculate Payment Statements
         </button>
       </form>
+
+      {/* Popup overlay for result */}
+      {showPopup && result && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <button className="popup-close" onClick={() => setShowPopup(false)}>
+              &times;
+            </button>
+            <h3>Game Created!</h3>
+            <div>
+              <strong>Settled At:</strong>{' '}
+              {result.settledAt
+                ? new Date(result.settledAt).toLocaleString()
+                : 'N/A'}
+            </div>
+            <div className="section-spacing">
+              <strong>Players:</strong>
+              <ul>
+                {(result.players || []).map((p, i) => (
+                  <li key={i}>
+                    {p.name} | Buy-In: {p.buyIn} | Cash-Out: {p.cashOut}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="section-spacing">
+              <strong>Settlements:</strong>
+              <ul>
+                {(result.settlements || []).map((s, i) => (
+                  <li key={i}>
+                    {s.from} pays {s.to}: {s.amount}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

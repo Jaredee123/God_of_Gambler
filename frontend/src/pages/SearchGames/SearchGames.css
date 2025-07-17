@@ -80,3 +80,11 @@ input[type='number'] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+.game-block {
+  margin-bottom: 1.5em;
+}
+
+.section-spacing {
+  margin-top: 0.5em;
+}
