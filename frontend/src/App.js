@@ -1,5 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from 'react-router-dom';
 
 import CreateGame from './pages/CreateGame/CreateGame';
 import SearchGames from './pages/SearchGames/SearchGames';
@@ -23,6 +28,9 @@ function App() {
           </Route>
           <Route path="/create-game" exact>
             <CreateGame />
+          </Route>
+          <Route>
+            <Redirect to="/" />
           </Route>
         </Switch>
       </main>
