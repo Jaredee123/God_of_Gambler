@@ -82,7 +82,12 @@ input[type='number'] {
 }
 
 .game-block {
-  margin-bottom: 1.5em;
+  margin-bottom: 2.5em;      /* Increased space between blocks */
+  padding: 18px 16px;        /* Add padding inside each block */
+  background: #f4f6fb;       /* Subtle background for each block */
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06); /* Soft shadow for separation */
+  border: 1px solid #e3e6ee; /* Light border for clarity */
 }
 
 .section-spacing {

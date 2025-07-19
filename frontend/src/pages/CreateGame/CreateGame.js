@@ -155,7 +155,7 @@ function CreateGame() {
     }
 
     try {
-      const response = await fetch('http://localhost:4000/games', {
+      const response = await fetch(process.env.REACT_APP_BACKEND_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -281,24 +281,37 @@ function CreateGame() {
             </div>
             <div className="section-spacing">
               <strong>Players:</strong>
-              <ul>
-                {(result.players || []).map((p, i) => (
-                  <li key={i}>
-                    {p.name} | Buy-In: {p.buyIn} | Cash-Out: {p.cashOut}
-                  </li>
-                ))}
-              </ul>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Buy-In</th>
+                    <th scope="col">Cash-Out</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(result.players || []).map((p, i) => (
+                    <tr>
+                      <td>{p.name}</td>
+                      <td>{p.buyIn}</td>
+                      <td>{p.cashOut}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div className="section-spacing">
-              <strong>Settlements:</strong>
-              <ul>
-                {(result.settlements || []).map((s, i) => (
-                  <li key={i}>
-                    {s.from} pays {s.to}: {s.amount}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {result.settlements && result.settlements.length > 0 && (
+              <div className="section-spacing">
+                <strong>Settlements:</strong>
+                <ul>
+                  {result.settlements.map((s, i) => (
+                    <li key={i}>
+                      {s.from} pays {s.to}: {s.amount}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -18,7 +18,9 @@ function SearchGames() {
     setSubmittedQuery(searchQuery); // Set submitted query here
     try {
       const response = await fetch(
-        `http://localhost:4000/games?player=${encodeURIComponent(searchQuery)}`,
+        `${process.env.REACT_APP_BACKEND_URL}?player=${encodeURIComponent(
+          searchQuery,
+        )}`,
         {
           method: 'GET',
           headers: {
@@ -72,24 +74,37 @@ function SearchGames() {
               </div>
               <div className="section-spacing">
                 <strong>Players:</strong>
-                <ul>
-                  {game.players.map((p, i) => (
-                    <li key={i}>
-                      {p.name} | Buy-In: {p.buyIn} | Cash-Out: {p.cashOut}
-                    </li>
-                  ))}
-                </ul>
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Name</th>
+                      <th scope="col">Buy-In</th>
+                      <th scope="col">Cash-Out</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {game.players.map((p, i) => (
+                      <tr key={i}>
+                        <td>{p.name}</td>
+                        <td>{p.buyIn}</td>
+                        <td>{p.cashOut}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <div className="section-spacing">
-                <strong>Settlements:</strong>
-                <ul>
-                  {game.settlements.map((s, i) => (
-                    <li key={i}>
-                      {s.from} pays {s.to}: {s.amount}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {game.settlements && game.settlements.length > 0 && (
+                <div className="section-spacing">
+                  <strong>Settlements:</strong>
+                  <ul>
+                    {game.settlements.map((s, i) => (
+                      <li key={i}>
+                        {s.from} pays {s.to}: {s.amount}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           ))}
         </div>
