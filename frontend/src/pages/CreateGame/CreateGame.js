@@ -5,6 +5,7 @@ function CreateGame() {
   const MAX_PLAYERS = 22;
   const [result, setResult] = useState(null); // For popup data
   const [showPopup, setShowPopup] = useState(false);
+  const [loading, setLoading] = useState(false); // Added loading state
 
   // Validators
   const validatorCount = (value) => {
@@ -154,6 +155,8 @@ function CreateGame() {
       });
     }
 
+    setLoading(true); // Set loading to true before the request
+
     try {
       const response = await fetch(process.env.REACT_APP_BACKEND_URL, {
         method: 'POST',
@@ -177,6 +180,8 @@ function CreateGame() {
       }
     } catch (err) {
       alert('Network error: ' + err.message);
+    } finally {
+      setLoading(false); // Set loading to false after the request is done
     }
   };
 
@@ -259,9 +264,9 @@ function CreateGame() {
         <button
           type="submit"
           className="btn-success"
-          disabled={!formState.formIsValid || sumMismatch}
+          disabled={!formState.formIsValid || sumMismatch || loading}
         >
-          Calculate Payment Statements
+          {loading ? 'Processing...' : 'Calculate Payment Statements'}
         </button>
       </form>
 
@@ -291,7 +296,7 @@ function CreateGame() {
                 </thead>
                 <tbody>
                   {(result.players || []).map((p, i) => (
-                    <tr>
+                    <tr key={i}>
                       <td>{p.name}</td>
                       <td>{p.buyIn}</td>
                       <td>{p.cashOut}</td>
