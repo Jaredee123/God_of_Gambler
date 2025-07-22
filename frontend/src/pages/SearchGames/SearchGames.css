@@ -93,3 +93,28 @@ input[type='number'] {
 .section-spacing {
   margin-top: 0.5em;
 }
+
+.loading-container {
+  text-align: center;
+  padding: 20px;
+  margin-top: 20px;
+  font-size: 16px;
+  color: #555;
+}
+
+/* Style the loading spinner */
+.loading-spinner {
+  border: 4px solid #f3f3f3; /* Light grey background */
+  border-top: 4px solid #3498db; /* Blue spinner color */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite; /* Spinner animation */
+  margin: 0 auto 10px auto;
+}
+
+/* Animation for the spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

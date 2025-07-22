@@ -5,7 +5,8 @@ function SearchGames() {
   const [searchQuery, setSearchQuery] = useState('');
   const [games, setGames] = useState([]);
   const [error, setError] = useState('');
-  const [submittedQuery, setSubmittedQuery] = useState(''); // Track last submitted query
+  const [submittedQuery, setSubmittedQuery] = useState('');
+  const [loading, setLoading] = useState(false); // Added loading state
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -15,7 +16,9 @@ function SearchGames() {
     event.preventDefault();
     setError('');
     setGames([]);
-    setSubmittedQuery(searchQuery); // Set submitted query here
+    setSubmittedQuery(searchQuery);
+    setLoading(true); // Set loading to true when the request is made
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}?player=${encodeURIComponent(
@@ -36,6 +39,8 @@ function SearchGames() {
       }
     } catch (err) {
       setError('Network error: ' + err.message);
+    } finally {
+      setLoading(false); // Set loading to false after the response is received
     }
   };
 
@@ -58,10 +63,11 @@ function SearchGames() {
         </button>
       </form>
       {error && <div className="error">{error}</div>}
-      {games.length === 0 && submittedQuery && !error && (
+      {/* Only show the results div after data is fetched and not in a loading state */}
+      {!loading && games.length === 0 && submittedQuery && !error && (
         <div className="results">No games found for "{submittedQuery}".</div>
       )}
-      {games.length > 0 && (
+      {!loading && games.length > 0 && submittedQuery && !error && (
         <div className="results">
           <h3>Games for "{submittedQuery}":</h3>
           {games.map((game, idx) => (
@@ -107,6 +113,12 @@ function SearchGames() {
               )}
             </div>
           ))}
+        </div>
+      )}
+      {loading && (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading results, please wait...</p>
         </div>
       )}
     </div>
