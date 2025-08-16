@@ -1,11 +1,11 @@
-// src/app.js
 import express from 'express';
 import mongoose from 'mongoose';
-import cors from 'cors'; // <-- add this line
+import cors from 'cors';
 import gamesRouter from './routes/games.js';
 
 const app = express();
-app.use(cors()); // <-- add this line
+
+app.use(cors());
 app.use(express.json());
 app.use('/games', gamesRouter);
 
@@ -15,8 +15,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message });
 });
 
-// Connect to Mongo & export app
+// Connect to Mongo
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true }).then(() => {
   console.log('MongoDB connected');
 });
-export default app;
+
+// Export the express app as a serverless function
+export default (req, res) => app(req, res);
