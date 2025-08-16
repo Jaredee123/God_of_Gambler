@@ -5,7 +5,17 @@ import gamesRouter from './routes/games.js';
 
 const app = express();
 
-app.use(cors());
+// Allow requests from your frontend domain (localhost:3000 during development)
+const allowedOrigins = ['http://localhost:3000', 'https://your-vercel-project.vercel.app'];
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
 app.use(express.json());
 app.use('/games', gamesRouter);
 
